@@ -12,7 +12,6 @@ from sklearn import linear_model
 from scipy.signal import find_peaks
 
 from config import Config
-from utils import cal_ssr
 
 
 def file_compare(x, y):
@@ -94,15 +93,15 @@ if __name__ == '__main__':
             y_process = y_stride.mean(axis=0)
 
             z1 = np.polyfit(x_process, y_process, 7)  # 用7次多项式拟合
-            p1 = np.poly1d(z1)  # 多项式系数
-            print(p1)  # 在屏幕上打印拟合多项式
+            poly_model = np.poly1d(z1)  # 多项式系数
+            print(poly_model)  # 在屏幕上打印拟合多项式
 
             # 用拟合的曲线去预测y坐标
-            y_pred = p1(sample.iloc[:, 0])
+            y_pred = poly_model(sample.iloc[:, 0])
             sample['y_pred'] = pd.DataFrame(y_pred)
             sample.to_csv(os.path.join(config.prediction_dir, f"{mode}/{mode}_prediction_{i + 1}"))
             # 计算SSR
-            ssr.append(cal_ssr(y_pred, np.mean(sample.iloc[:, 1])))
+            # ssr.append(cal_ssr(y_pred, np.mean(sample.iloc[:, 1])))
 
             # 搜寻原数据的峰值
             peaks, _ = find_peaks(y_process, height=y_process.mean(), threshold=2, distance=100, width=1)
@@ -117,8 +116,8 @@ if __name__ == '__main__':
         plt.show()
 
     # 保存ssr
-    ssr = pd.DataFrame(ssr, columns=['ssr'], index=range(1, len(ssr) + 1))
-    ssr.to_csv(os.path.join(config.prediction_dir, f"{mode}/{mode}_ssr"))
+    # ssr = pd.DataFrame(ssr, columns=['ssr'], index=range(1, len(ssr) + 1))
+    # ssr.to_csv(os.path.join(config.prediction_dir, f"{mode}/{mode}_ssr"))
 
     """统计数据特征信息
     平均值
